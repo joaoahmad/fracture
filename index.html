@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <!-- Basic Page Needs
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <meta charset="utf-8">
+    <title>Your page title here :)</title>
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Mobile Specific Metas
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- FONT
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <link href="//fonts.googleapis.com/css?family=Raleway:400,300,600" rel="stylesheet" type="text/css">
+
+    <!-- CSS
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <link rel="stylesheet" href="css/main.css">
+
+    <!-- Favicon
+    –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    <script src="http://code.jquery.com/jquery-1.12.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/trianglify/0.4.0/trianglify.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.5.0/lodash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/velocity/1.2.3/velocity.min.js"></script>
+</head>
+<body>
+<style media="screen">
+.fract{
+    float: left;
+    position: relative;
+    width: 800px;
+    height: 380px;
+    /*overflow: hidden;*/
+}
+.fract > span{
+    position: absolute;
+    /*box-shadow: 0 0 0 1px rgba(255,255,255,.2);*/
+}
+</style>
+<div class="wrapper">
+    <div class="card">
+        <img src="images/image.jpg">
+        <div class="fract"></div>
+        <br>
+    </div>
+</div>
+<script type="text/javascript">
+(function(){
+    var card = $('.card');
+    var fract = $('.fract');
+    var img = $('.card img')[0];
+    var pattern = Trianglify({
+        width: 800,
+        height: 300,
+        cell_size: 100,
+        // variance: 0,
+        variance: 0.75,
+    });
+    canvas = document.createElement("canvas");
+    var ctx = canvas.getContext('2d');
+
+    // var h = {}
+    // h.setRange = function(value, min, max){
+    //     obj.top = obj.
+    // }
+
+    var fractures = pattern.polys.map(function(item, i){
+
+        // if(i != 37) return;
+
+        var obj = {};
+        var coord = item[1];
+
+        // position
+        var top = 9999;
+        var left = 9999;
+
+        var right = -9999;
+        var bottom = -9999;
+
+        coord = coord.map(function(item){
+
+            // set max
+
+            if (item[0] < 0)
+            item[0] = 0;
+
+            if (item[0] > fract.width())
+            item[0] = fract.width();
+
+            if (item[1] < 0)
+            item[1] = 0;
+
+            if (item[1] > fract.height())
+            item[1] = fract.height();
+
+            //
+
+            // left
+            if (item[0] < left)
+            left = item[0];
+
+            // top
+            if (item[1] < top)
+            top = item[1];
+
+            // right
+            if (item[0] > right)
+            right = item[0];
+
+            // bottom
+            if (item[1] > bottom)
+            bottom = item[1];
+
+            // item = h.setRange(item, 0, 10);
+
+            obj.left = left;
+            obj.top = top;
+            obj.right = right;
+            obj.bottom = bottom;
+
+            return item;
+        });
+
+        obj.width = obj.right - obj.left;
+        obj.height = obj.bottom - obj.top;
+
+        if(
+            (obj.top + obj.height) < 0 ||
+            (obj.left + obj.width) < 0 ||
+            obj.left > fract.width() ||
+            obj.top > fract.height()
+        )
+        return;
+
+        canvas.width = obj.width;
+        canvas.height = obj.height;
+
+        ctx.fillStyle="#A2322E";
+        ctx.beginPath();
+        ctx.moveTo(coord[0][0] - left, coord[0][1] - top);
+        ctx.lineTo(coord[1][0] - left, coord[1][1] - top);
+        ctx.lineTo(coord[2][0] - left, coord[2][1] - top);
+        ctx.closePath();
+        ctx.clip();
+
+        ctx.drawImage(img, (obj.left*-1), (obj.top*-1), img.width, img.height);
+        obj.image = canvas.toDataURL();
+
+        return obj;
+    });
+
+
+    // return;
+
+    // ctx.drawImage(img,0,0, img.width, img.height);
+    // var base64 = canvas.toDataURL();
+    // var base64 = obj;
+    fractures.map(function(item){
+
+        if (!item)
+        return;
+
+        var span = $('<span />');
+        span.css({
+            top: item.top,
+            left: item.left,
+            width: item.width,
+            height: item.height,
+            'background-image': `url(${item.image})`
+        });
+        // console.log(span);
+        fract.append(span);
+        span.velocity({
+            translateX: item.left * _.random(0.1, 0.5),
+            translateZ: 0,
+            blur: item.left/100,
+         }, 1000);
+    });
+    $(img).hide();
+
+    var svg = pattern.svg();
+    // card.append(canvas);
+    card.append(svg);
+
+    // console.log(pattern);
+
+
+})();
+</script>
+</body>
+</html>
