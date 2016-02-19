@@ -31,166 +31,185 @@
 </head>
 <body>
 <style media="screen">
-.fract{
+.fracture{
     float: left;
     position: relative;
-    width: 800px;
+    width: 1200px;
     height: 380px;
     /*overflow: hidden;*/
 }
-.fract > span{
+.fracture > span{
     position: absolute;
     /*box-shadow: 0 0 0 1px rgba(255,255,255,.2);*/
 }
 </style>
 <div class="wrapper">
     <div class="card">
-        <img src="images/image.jpg">
-        <div class="fract"></div>
+        <div class="fracture" data-image="images/image2.jpeg"></div>
         <br>
+        <input class="range" type="range" min="0" max="100" value="0">
     </div>
 </div>
 <script type="text/javascript">
 (function(){
     var card = $('.card');
-    var fract = $('.fract');
-    var img = $('.card img')[0];
-    var pattern = Trianglify({
-        width: 800,
-        height: 300,
-        cell_size: 100,
-        // variance: 0,
-        variance: 0.75,
-    });
-    canvas = document.createElement("canvas");
-    var ctx = canvas.getContext('2d');
+    var fract = $('.fracture');
+    var img = document.createElement('img');
+    img.src = fract.data('image');
 
-    // var h = {}
-    // h.setRange = function(value, min, max){
-    //     obj.top = obj.
-    // }
+    img.onload = function(){
+        img.ratio = img.width/img.height;
+        img.width = fract.width();
+        img.height = fract.width() / img.ratio;
 
-    var fractures = pattern.polys.map(function(item, i){
+        var pattern = Trianglify({
+            width: fract.width(),
+            height: fract.height(),
+            cell_size: 100,
+            // variance: 0,
+            variance: 0.75,
+        });
+        canvas = document.createElement("canvas");
+        var ctx = canvas.getContext('2d');
 
-        // if(i != 37) return;
+        // var h = {}
+        // h.setRange = function(value, min, max){
+        //     obj.top = obj.
+        // }
 
-        var obj = {};
-        var coord = item[1];
+        var fractures = pattern.polys.map(function(item, i){
 
-        // position
-        var top = 9999;
-        var left = 9999;
+            // if(i != 37) return;
 
-        var right = -9999;
-        var bottom = -9999;
+            var obj = {};
+            var coord = item[1];
 
-        coord = coord.map(function(item){
+            // position
+            var top = 9999;
+            var left = 9999;
 
-            // set max
+            var right = -9999;
+            var bottom = -9999;
 
-            if (item[0] < 0)
-            item[0] = 0;
+            coord = coord.map(function(item){
 
-            if (item[0] > fract.width())
-            item[0] = fract.width();
+                // set max
 
-            if (item[1] < 0)
-            item[1] = 0;
+                if (item[0] < 0)
+                item[0] = 0;
 
-            if (item[1] > fract.height())
-            item[1] = fract.height();
+                if (item[0] > fract.width())
+                item[0] = fract.width();
 
-            //
+                if (item[1] < 0)
+                item[1] = 0;
 
-            // left
-            if (item[0] < left)
-            left = item[0];
+                if (item[1] > fract.height())
+                item[1] = fract.height();
 
-            // top
-            if (item[1] < top)
-            top = item[1];
+                //
 
-            // right
-            if (item[0] > right)
-            right = item[0];
+                // left
+                if (item[0] < left)
+                left = item[0];
 
-            // bottom
-            if (item[1] > bottom)
-            bottom = item[1];
+                // top
+                if (item[1] < top)
+                top = item[1];
 
-            // item = h.setRange(item, 0, 10);
+                // right
+                if (item[0] > right)
+                right = item[0];
 
-            obj.left = left;
-            obj.top = top;
-            obj.right = right;
-            obj.bottom = bottom;
+                // bottom
+                if (item[1] > bottom)
+                bottom = item[1];
 
-            return item;
+                // item = h.setRange(item, 0, 10);
+
+                obj.left = left;
+                obj.top = top;
+                obj.right = right;
+                obj.bottom = bottom;
+
+                return item;
+            });
+
+            obj.width = obj.right - obj.left;
+            obj.height = obj.bottom - obj.top;
+
+            if(
+                (obj.top + obj.height) < 0 ||
+                (obj.left + obj.width) < 0 ||
+                obj.left > fract.width() ||
+                obj.top > fract.height()
+            )
+            return;
+
+            canvas.width = obj.width;
+            canvas.height = obj.height;
+
+            ctx.fillStyle="#A2322E";
+            ctx.beginPath();
+            ctx.moveTo(coord[0][0] - left, coord[0][1] - top);
+            ctx.lineTo(coord[1][0] - left, coord[1][1] - top);
+            ctx.lineTo(coord[2][0] - left, coord[2][1] - top);
+            ctx.closePath();
+            ctx.clip();
+
+            ctx.drawImage(img, (obj.left*-1), (obj.top*-1), img.width, img.height);
+            obj.image = canvas.toDataURL();
+
+            return obj;
         });
 
-        obj.width = obj.right - obj.left;
-        obj.height = obj.bottom - obj.top;
 
-        if(
-            (obj.top + obj.height) < 0 ||
-            (obj.left + obj.width) < 0 ||
-            obj.left > fract.width() ||
-            obj.top > fract.height()
-        )
-        return;
+        // return;
 
-        canvas.width = obj.width;
-        canvas.height = obj.height;
+        // ctx.drawImage(img,0,0, img.width, img.height);
+        // var base64 = canvas.toDataURL();
+        // var base64 = obj;
+        fractures.map(function(item){
 
-        ctx.fillStyle="#A2322E";
-        ctx.beginPath();
-        ctx.moveTo(coord[0][0] - left, coord[0][1] - top);
-        ctx.lineTo(coord[1][0] - left, coord[1][1] - top);
-        ctx.lineTo(coord[2][0] - left, coord[2][1] - top);
-        ctx.closePath();
-        ctx.clip();
+            if (!item)
+            return;
 
-        ctx.drawImage(img, (obj.left*-1), (obj.top*-1), img.width, img.height);
-        obj.image = canvas.toDataURL();
-
-        return obj;
-    });
-
-
-    // return;
-
-    // ctx.drawImage(img,0,0, img.width, img.height);
-    // var base64 = canvas.toDataURL();
-    // var base64 = obj;
-    fractures.map(function(item){
-
-        if (!item)
-        return;
-
-        var span = $('<span />');
-        span.css({
-            top: item.top,
-            left: item.left,
-            width: item.width,
-            height: item.height,
-            'background-image': `url(${item.image})`
+            var span = $('<span />');
+            span.css({
+                top: item.top,
+                left: item.left,
+                width: item.width,
+                height: item.height,
+                'background-image': `url(${item.image})`
+            });
+            // console.log(span);
+            fract.append(span);
         });
-        // console.log(span);
-        fract.append(span);
-        span.velocity({
-            translateX: item.left * _.random(0.1, 0.5),
-            translateZ: 0,
-            blur: item.left/100,
-         }, 1000);
+        $(img).hide();
+
+        var svg = pattern.svg();
+        // card.append(canvas);
+        // card.append(svg);
+
+        // console.log(pattern);
+    }
+
+    $('.range').on('change mousemove', function(){
+        var value = this.value;
+        fract.find('span').each(function(){
+            var left = parseInt($(this).css('left'));
+            var x = (value * left) / 100;
+
+            var top = parseInt($(this).css('top'));
+            var y = (value * top) / 100;
+
+            console.log(x);
+            $(this).css({
+                // 'transform': `translate3d(${x}px,${y}px,0)`
+                'transform': `translate3d(0,${y}px,0)`
+            });
+        });
     });
-    $(img).hide();
-
-    var svg = pattern.svg();
-    // card.append(canvas);
-    card.append(svg);
-
-    // console.log(pattern);
-
 
 })();
 </script>
