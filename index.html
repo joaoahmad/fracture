@@ -27,7 +27,7 @@
     <script src="http://code.jquery.com/jquery-1.12.0.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/trianglify/0.4.0/trianglify.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.5.0/lodash.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/velocity/1.2.3/velocity.min.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/velocity/1.2.3/velocity.min.js"></script> -->
 </head>
 <body>
 <style media="screen">
@@ -65,9 +65,8 @@
         var pattern = Trianglify({
             width: fract.width(),
             height: fract.height(),
-            cell_size: 100,
-            // variance: 0,
-            variance: 0.75,
+            cell_size: 80,
+            variance: 0.8,
         });
         canvas = document.createElement("canvas");
         var ctx = canvas.getContext('2d');
@@ -76,6 +75,8 @@
         // h.setRange = function(value, min, max){
         //     obj.top = obj.
         // }
+
+        var limitH = 0.5;
 
         var fractures = pattern.polys.map(function(item, i){
 
@@ -142,6 +143,7 @@
                 (obj.top + obj.height) < 0 ||
                 (obj.left + obj.width) < 0 ||
                 obj.left > fract.width() ||
+                obj.top < fract.height() * limitH ||
                 obj.top > fract.height()
             )
             return;
@@ -169,18 +171,24 @@
         // ctx.drawImage(img,0,0, img.width, img.height);
         // var base64 = canvas.toDataURL();
         // var base64 = obj;
+        fract.css('background', `url(${img.src}) top center / cover`);
         fractures.map(function(item){
 
-            if (!item)
+            if (!item || item.image == 'data:,')
             return;
 
+            var blur = Math.round(item.top * rand()/40);
+            console.log(blur);
+            var _top = item.top - rand() * 10;
+            var _left = item.left + rand() * 20;
             var span = $('<span />');
             span.css({
-                top: item.top,
-                left: item.left,
+                top: _top,
+                left: _left,
                 width: item.width,
                 height: item.height,
-                'background-image': `url(${item.image})`
+                'background-image': `url(${item.image})`,
+                '-webkit-filter': `blur(${blur}px)`
             });
             // console.log(span);
             fract.append(span);
@@ -189,7 +197,7 @@
 
         var svg = pattern.svg();
         // card.append(canvas);
-        // card.append(svg);
+        card.append(svg);
 
         // console.log(pattern);
     }
