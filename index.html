@@ -43,16 +43,15 @@
     /*box-shadow: 0 0 0 1px rgba(255,255,255,.2);*/
 }
 </style>
+
 <div class="wrapper">
-    <div class="card">
+    <div class="container">
         <div class="fracture" data-image="images/image2.jpeg"></div>
-        <br>
-        <input class="range" type="range" min="0" max="100" value="0">
     </div>
 </div>
+
 <script type="text/javascript">
 (function(){
-    var card = $('.card');
     var fract = $('.fracture');
     var img = document.createElement('img');
     img.src = fract.data('image');
@@ -76,94 +75,136 @@
         //     obj.top = obj.
         // }
 
-        var limitH = 0.5;
+        var cutRatio = 0.5;
 
-        var fractures = pattern.polys.map(function(item, i){
+        var s = {
+            size: 20,
+            variation: 0.75
+        }
 
-            // if(i != 37) return;
+        var phase = {
+            a: parseFloat(rand().toFixed(2)),
+            b: parseFloat(rand().toFixed(2)),
+            c: parseFloat(rand().toFixed(2)),
+        }
 
-            var obj = {};
-            var coord = item[1];
+        limitH = {
+            a: img.height * cutRatio,
+            b: img.height,
+        }
 
-            // position
-            var top = 9999;
-            var left = 9999;
+        console.log(limitH);
 
-            var right = -9999;
-            var bottom = -9999;
+        canvas.width = img.width;
+        canvas.height = img.height;
 
-            coord = coord.map(function(item){
+        ctx.drawImage(img, 0,0, img.width, img.height);
+        ctx.fillStyle="#A2322E";
+        ctx.beginPath();
+        ctx.arc(100,75,50,0,2*Math.PI);
+        // ctx.moveTo(x, y);
+        // ctx.lineTo(x, y);
+        // ctx.lineTo(x, y);
+        // ctx.lineTo(x, y);
+        // ctx.closePath();
+        ctx.fill();
+        // for (var y = limitH.a ; y <= limitH.b ; y+=y){
+        //     for (var x = 0 ; x <= img.width ; x+=x){
+        //
+        //     }
+        // }
+        // ctx.clip();
 
-                // set max
+        // obj.image = canvas.toDataURL();
+        fract.after(canvas);
+        return;
 
-                if (item[0] < 0)
-                item[0] = 0;
-
-                if (item[0] > fract.width())
-                item[0] = fract.width();
-
-                if (item[1] < 0)
-                item[1] = 0;
-
-                if (item[1] > fract.height())
-                item[1] = fract.height();
-
-                //
-
-                // left
-                if (item[0] < left)
-                left = item[0];
-
-                // top
-                if (item[1] < top)
-                top = item[1];
-
-                // right
-                if (item[0] > right)
-                right = item[0];
-
-                // bottom
-                if (item[1] > bottom)
-                bottom = item[1];
-
-                // item = h.setRange(item, 0, 10);
-
-                obj.left = left;
-                obj.top = top;
-                obj.right = right;
-                obj.bottom = bottom;
-
-                return item;
-            });
-
-            obj.width = obj.right - obj.left;
-            obj.height = obj.bottom - obj.top;
-
-            if(
-                (obj.top + obj.height) < 0 ||
-                (obj.left + obj.width) < 0 ||
-                obj.left > fract.width() ||
-                obj.top < fract.height() * limitH ||
-                obj.top > fract.height()
-            )
-            return;
-
-            canvas.width = obj.width;
-            canvas.height = obj.height;
-
-            ctx.fillStyle="#A2322E";
-            ctx.beginPath();
-            ctx.moveTo(coord[0][0] - left, coord[0][1] - top);
-            ctx.lineTo(coord[1][0] - left, coord[1][1] - top);
-            ctx.lineTo(coord[2][0] - left, coord[2][1] - top);
-            ctx.closePath();
-            ctx.clip();
-
-            ctx.drawImage(img, (obj.left*-1), (obj.top*-1), img.width, img.height);
-            obj.image = canvas.toDataURL();
-
-            return obj;
-        });
+        // var fractures = pattern.polys.map(function(item, i){
+        //
+        //     // if(i != 37) return;
+        //
+        //     var obj = {};
+        //     var coord = item[1];
+        //
+        //     // position
+        //     var top = 9999;
+        //     var left = 9999;
+        //
+        //     var right = -9999;
+        //     var bottom = -9999;
+        //
+        //     coord = coord.map(function(item){
+        //
+        //         // set max
+        //
+        //         if (item[0] < 0)
+        //         item[0] = 0;
+        //
+        //         if (item[0] > fract.width())
+        //         item[0] = fract.width();
+        //
+        //         if (item[1] < 0)
+        //         item[1] = 0;
+        //
+        //         if (item[1] > fract.height())
+        //         item[1] = fract.height();
+        //
+        //         //
+        //
+        //         // left
+        //         if (item[0] < left)
+        //         left = item[0];
+        //
+        //         // top
+        //         if (item[1] < top)
+        //         top = item[1];
+        //
+        //         // right
+        //         if (item[0] > right)
+        //         right = item[0];
+        //
+        //         // bottom
+        //         if (item[1] > bottom)
+        //         bottom = item[1];
+        //
+        //         // item = h.setRange(item, 0, 10);
+        //
+        //         obj.left = left;
+        //         obj.top = top;
+        //         obj.right = right;
+        //         obj.bottom = bottom;
+        //
+        //         return item;
+        //     });
+        //
+        //     obj.width = obj.right - obj.left;
+        //     obj.height = obj.bottom - obj.top;
+        //
+        //     if(
+        //         (obj.top + obj.height) < 0 ||
+        //         (obj.left + obj.width) < 0 ||
+        //         obj.left > fract.width() ||
+        //         obj.top < fract.height() * limitH ||
+        //         obj.top > fract.height()
+        //     )
+        //     return;
+        //
+        //     canvas.width = obj.width;
+        //     canvas.height = obj.height;
+        //
+        //     ctx.fillStyle="#A2322E";
+        //     ctx.beginPath();
+        //     ctx.moveTo(coord[0][0] - left, coord[0][1] - top);
+        //     ctx.lineTo(coord[1][0] - left, coord[1][1] - top);
+        //     ctx.lineTo(coord[2][0] - left, coord[2][1] - top);
+        //     ctx.closePath();
+        //     ctx.clip();
+        //
+        //     ctx.drawImage(img, (obj.left*-1), (obj.top*-1), img.width, img.height);
+        //     obj.image = canvas.toDataURL();
+        //
+        //     return obj;
+        // });
 
 
         // return;
@@ -171,33 +212,32 @@
         // ctx.drawImage(img,0,0, img.width, img.height);
         // var base64 = canvas.toDataURL();
         // var base64 = obj;
-        fract.css('background', `url(${img.src}) top center / cover`);
-        fractures.map(function(item){
-
-            if (!item || item.image == 'data:,')
-            return;
-
-            var blur = Math.round(item.top * rand()/40);
-            console.log(blur);
-            var _top = item.top - rand() * 10;
-            var _left = item.left + rand() * 20;
-            var span = $('<span />');
-            span.css({
-                top: _top,
-                left: _left,
-                width: item.width,
-                height: item.height,
-                'background-image': `url(${item.image})`,
-                '-webkit-filter': `blur(${blur}px)`
-            });
-            // console.log(span);
-            fract.append(span);
-        });
+        // fract.css('background', `url(${img.src}) top center / cover`);
+        // fractures.map(function(item){
+        //
+        //     if (!item || item.image == 'data:,')
+        //     return;
+        //
+        //     var blur = Math.round(item.top * rand()/40);
+        //     var _top = item.top - rand() * 10;
+        //     var _left = item.left + rand() * 20;
+        //     var span = $('<span />');
+        //     span.css({
+        //         top: _top,
+        //         left: _left,
+        //         width: item.width,
+        //         height: item.height,
+        //         // 'background-image': `url(${item.image})`,
+        //         // '-webkit-filter': `blur(${blur}px)`
+        //     });
+        //     // console.log(span);
+        //     fract.append(span);
+        // });
         $(img).hide();
 
-        var svg = pattern.svg();
+        // var svg = pattern.svg();
         // card.append(canvas);
-        card.append(svg);
+        // fract.after(svg);
 
         // console.log(pattern);
     }

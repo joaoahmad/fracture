@@ -657,7 +657,6 @@ body {
   display: inline-block;
   vertical-align: top;
   width: 100%;
-  background-image: linear-gradient(#E5F9FB, #AACCFF);
 }
 
 *, *::before, *::after {
@@ -2083,9 +2082,6 @@ img {
 
 .wrapper {
   position: absolute;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
   top: 0;
   left: 0;
   width: 100%;
